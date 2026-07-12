@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Inbox Placement Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            margin-left: 0.5rem;
+        }
+
+        nav button.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        nav button:not(.active) {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        nav button:hover {
+            opacity: 0.9;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-box {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #374151;
+        }
+
+        input, textarea, select {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            ring: 2px;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button.primary {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        button.primary:hover {
+            background: #1d4ed8;
+        }
+
+        button.secondary {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        button.secondary:hover {
+            background: #d1d5db;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table th {
+            background: #f9fafb;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>📧 Inbox Placement Tester</h1>
+            <div>
+                <button onclick="showPage('dashboard')" class="active" id="btn-dashboard">Dashboard</button>
+                <button onclick="showPage('browse')" id="btn-browse">📧 Browse Emails</button>
+                <button onclick="showPage('accounts')" id="btn-accounts">Accounts</button>
+                <button onclick="showPage('create')" id="btn-create">New Test</button>
+                <button onclick="showPage('results')" id="btn-results">Results</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Browse Emails -->
+        <div id="browse" class="page">
+            <div class="card">
+                <h2 style="margin: 0 0 1.5rem 0;">📧 Search Mail</h2>
+                <input type="text" id="search-emails" placeholder="🔍 Search by sender or subject..." style="width: 100%; padding: 0.75rem; margin-bottom: 1.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem;" onkeyup="filterEmails()">
+
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                    <button class="primary" onclick="loadBrowseEmails()" style="flex: 1; min-width: 150px;">🔄 Refresh Emails</button>
+                    <button class="secondary" onclick="filterByFolder('all')" style="flex: 1; min-width: 100px;">Show All</button>
+                    <button class="secondary" onclick="filterByFolder('Inbox')" style="flex: 1; min-width: 100px;">Inbox</button>
+                    <button class="secondary" onclick="filterByFolder('Spam')" style="flex: 1; min-width: 100px;">Spam</button>
+                    <button class="secondary" onclick="filterByFolder('Promotions')" style="flex: 1; min-width: 100px;">Promotions</button>
+                </div>
+            </div>
+
+            <div id="browse-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+                <div style="grid-column: 1/-1; text-align: center; color: #9ca3af; padding: 3rem;">
+                    Click "Refresh Emails" to load emails from your Gmail
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="page active">
+            <h2>Dashboard</h2>
+            <div class="grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="total-accounts">0</div>
+                    <div class="stat-label">Gmail Accounts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="inbox-rate">0%</div>
+                    <div class="stat-label">Inbox Rate</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="spam-rate">0%</div>
+                    <div class="stat-label">Spam Rate</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Recent Tests</h3>
+                <table id="recent-tests">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Status</th>
+                            <th>Accounts</th>
+                            <th>Sent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tests-body">
+                        <tr><td colspan="4" style="text-align: center; color: #9ca3af;">No tests yet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Accounts -->
+        <div id="accounts" class="page">
+            <h2>Gmail Accounts</h2>
+            <div class="card">
+                <button class="primary" onclick="connectAccount()">🔗 Connect Account</button>
+            </div>
+            <div id="accounts-list" class="grid">
+                <p style="color: #9ca3af;">No accounts connected. Click "Connect Account" to get started!</p>
+            </div>
+        </div>
+
+        <!-- Create Test -->
+        <div id="create" class="page">
+            <h2>Create New Test</h2>
+            <div class="card">
+                <form onsubmit="createTest(event)">
+                    <div>
+                        <label>Campaign Name *</label>
+                        <input type="text" id="campaign-name" required>
+                    </div>
+                    <div>
+                        <label>From Email *</label>
+                        <input type="email" id="sender-email" required>
+                    </div>
+                    <div>
+                        <label>Subject Line *</label>
+                        <input type="text" id="subject" required>
+                    </div>
+                    <div>
+                        <label>Plain Text Body</label>
+                        <textarea id="text-body"></textarea>
+                    </div>
+                    <div>
+                        <label>HTML Body *</label>
+                        <textarea id="html-body" required></textarea>
+                    </div>
+                    <button type="submit" class="primary">📤 Create & Send Test</button>
+                </form>
+                <div id="create-message"></div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="page">
+            <h2>Test Results</h2>
+            <div class="card">
+                <input type="text" id="search-results" placeholder="🔍 Search by email address..." style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem;" onkeyup="filterResults()">
+            </div>
+            <div id="results-content" class="card">
+                <p style="color: #9ca3af; text-align: center;">Load a test to see results</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'https://loyal-tenderness-production-2471.up.railway.app/api';
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+            document.getElementById('btn-' + page).classList.add('active');
+            if (page === 'dashboard') loadDashboard();
+            if (page === 'accounts') loadAccounts();
+            if (page === 'results') loadResults();
+        }
+
+        async function loadDashboard() {
+            try {
+                const [tests, accounts] = await Promise.all([
+                    fetch(`${API_URL}/tests`).then(r => r.json()).catch(() => []),
+                    fetch(`${API_URL}/accounts`).then(r => r.json()).catch(() => [])
+                ]);
+
+                document.getElementById('total-tests').textContent = tests.length || 0;
+                document.getElementById('total-accounts').textContent = accounts.length || 0;
+
+                let tbody = '<tr><td colspan="4" style="text-align: center; color: #9ca3af;">No tests yet</td></tr>';
+                if (tests.length > 0) {
+                    tbody = tests.slice(0, 5).map(t => `
+                        <tr>
+                            <td>${t.campaign_name}</td>
+                            <td><span class="badge success">${t.status}</span></td>
+                            <td>${t.total_accounts}</td>
+                            <td>${t.sent_time ? new Date(t.sent_time).toLocaleDateString() : '-'}</td>
+                        </tr>
+                    `).join('');
+                }
+                document.getElementById('tests-body').innerHTML = tbody;
+            } catch (e) {
+                console.error('Failed to load dashboard:', e);
+            }
+        }
+
+        async function loadAccounts() {
+            try {
+                const accounts = await fetch(`${API_URL}/accounts`).then(r => r.json()).catch(() => []);
+                let html = accounts.length === 0
+                    ? '<p style="color: #9ca3af;">No accounts connected yet</p>'
+                    : accounts.map(a => `
+                        <div class="card">
+                            <h3>${a.email}</h3>
+                            <p style="color: #6b7280; font-size: 0.875rem;">Last sync: ${a.last_sync ? new Date(a.last_sync).toLocaleString() : 'Never'}</p>
+                            <button class="secondary" onclick="deleteAccount(${a.id})">Delete</button>
+                        </div>
+                    `).join('');
+                document.getElementById('accounts-list').innerHTML = html;
+            } catch (e) {
+                console.error('Failed to load accounts:', e);
+            }
+        }
+
+        async function connectAccount() {
+            const state = 'user_' + Date.now();
+            try {
+                const res = await fetch(`${API_URL}/accounts/oauth-url?state=${state}`);
+                const data = await res.json();
+                window.location.href = data.url;
+            } catch (e) {
+                alert('Failed to connect: ' + e.message);
+            }
+        }
+
+        async function deleteAccount(id) {
+            if (!confirm('Delete this account?')) return;
+            try {
+                await fetch(`${API_URL}/accounts/${id}`, { method: 'DELETE' });
+                loadAccounts();
+            } catch (e) {
+                alert('Failed to delete: ' + e.message);
+            }
+        }
+
+        async function createTest(e) {
+            e.preventDefault();
+            const msg = document.getElementById('create-message');
+            msg.innerHTML = '<div class="alert info"><div class="spinner" style="display: inline-block; margin-right: 0.5rem;"></div>Creating test...</div>';
+
+            try {
+                const data = {
+                    campaign_name: document.getElementById('campaign-name').value,
+                    subject: document.getElementById('subject').value,
+                    sender_email: document.getElementById('sender-email').value,
+                    html_body: document.getElementById('html-body').value,
+                    plain_text_body: document.getElementById('text-body').value || undefined
+                };
+
+                const res = await fetch(`${API_URL}/tests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+                const test = await res.json();
+
+                msg.innerHTML = '<div class="alert success">✓ Test created! Sending emails...</div>';
+
+                const sendRes = await fetch(`${API_URL}/tests/${test.id}/send`, { method: 'POST' });
+                if (sendRes.ok) {
+                    msg.innerHTML = '<div class="alert success">✓ Test sent to all accounts! <a href="#" onclick="showPage(\'results\'); return false;">View Results</a></div>';
+                    e.target.reset();
+                } else {
+                    throw new Error('Send failed');
+                }
+            } catch (e) {
+                msg.innerHTML = '<div class="alert error">✗ Error: ' + e.message + '</div>';
+            }
+        }
+
+        async function loadResults() {
+            try {
+                const tests = await fetch(`${API_URL}/tests`).then(r => r.json()).catch(() => []);
+                if (tests.length === 0) {
+                    document.getElementById('results-content').innerHTML = '<p style="color: #9ca3af;">No tests found</p>';
+                    return;
+                }
+
+                const test = tests[0];
+                const results = await fetch(`${API_URL}/tests/${test.id}/results`).then(r => r.json()).catch(() => []);
+
+                let html = `<div style="margin-bottom: 2rem;">
+                    <h3>${test.campaign_name}</h3>
+                    <p style="color: #6b7280; font-size: 0.875rem;">Subject: <strong>${test.subject}</strong></p>
+                    <p style="color: #6b7280; font-size: 0.875rem;">From: <strong>${test.sender_email}</strong></p>
+                </div>`;
+
+                if (results.length === 0) {
+                    html += '<p style="color: #9ca3af; text-align: center; padding: 2rem;">No results yet. Scan to see where emails landed.</p>';
+                } else {
+                    html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">';
+
+                    html += results.map(r => {
+                        const folderColor = {
+                            'INBOX': '#d1fae5',
+                            'PROMOTIONS': '#fef3c7',
+                            'SOCIAL': '#e0e7ff',
+                            'UPDATES': '#bfdbfe',
+                            'SPAM': '#fee2e2',
+                            'TRASH': '#f3f4f6',
+                            'NOT_FOUND': '#f9fafb'
+                        };
+                        const badgeColor = {
+                            'INBOX': '#10b981',
+                            'PROMOTIONS': '#f59e0b',
+                            'SOCIAL': '#6366f1',
+                            'UPDATES': '#3b82f6',
+                            'SPAM': '#ef4444',
+                            'TRASH': '#6b7280',
+                            'NOT_FOUND': '#9ca3af'
+                        };
+
+                        return `
+                            <div data-email="${r.email || 'unknown'}" data-folder="${r.folder}" style="background: ${folderColor[r.folder]}; border-radius: 0.5rem; padding: 1.5rem; border-left: 4px solid ${badgeColor[r.folder]};">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                    <div>
+                                        <h4 style="margin: 0; color: #1f2937; font-size: 0.95rem;">${r.email || 'Unknown'}</h4>
+                                        <p style="margin: 0.25rem 0 0 0; color: #6b7280; font-size: 0.8rem;">Gmail Account</p>
+                                    </div>
+                                    <span style="background: ${badgeColor[r.folder]}; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+                                        ${r.folder === 'NOT_FOUND' ? 'Not Received' : r.folder}
+                                    </span>
+                                </div>
+
+                                <div style="background: rgba(0,0,0,0.05); padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 0.75rem; font-size: 0.8rem; color: #4b5563; max-height: 60px; overflow: hidden;">
+                                    ${r.labels ? `<strong>Labels:</strong> ${r.labels}` : 'No labels'}
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; color: #6b7280;">
+                                    <div><strong>Received:</strong> ${r.received_time ? new Date(r.received_time).toLocaleTimeString() : '-'}</div>
+                                    <div><strong>Delivery:</strong> ${r.delivery_time_seconds ? r.delivery_time_seconds.toFixed(1) + 's' : '-'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    html += '</div>';
+                }
+
+                html += `<button class="primary" onclick="scanTest(${test.id})" style="margin-top: 1rem;">🔍 Scan Again</button>`;
+
+                document.getElementById('results-content').innerHTML = html;
+            } catch (e) {
+                console.error('Failed to load results:', e);
+            }
+        }
+
+        async function scanTest(testId) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Scanning...';
+
+            try {
+                await fetch(`${API_URL}/tests/${testId}/scan`, { method: 'POST' });
+                await new Promise(r => setTimeout(r, 2000));
+                loadResults();
+            } catch (e) {
+                alert('Scan failed: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Scan Again';
+            }
+        }
+
+        function filterResults() {
+            const searchTerm = document.getElementById('search-results').value.toLowerCase();
+            const cards = document.querySelectorAll('[data-email]');
+
+            cards.forEach(card => {
+                const email = card.getAttribute('data-email').toLowerCase();
+                const folder = card.getAttribute('data-folder').toLowerCase();
+
+                if (email.includes(searchTerm) || folder.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        async function loadBrowseEmails() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Loading...';
+
+            try {
+                const response = await fetch(`${API_URL}/tests/browse/emails`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to load emails');
+                }
+
+                displayBrowseEmails(data.emails);
+                btn.textContent = '🔄 Refresh Emails';
+            } catch (e) {
+                document.getElementById('browse-content').innerHTML = `<p style="color: #ef4444; text-align: center;">Error: ${e.message}</p>`;
+                btn.textContent = '🔄 Refresh Emails';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function displayBrowseEmails(emails) {
+            if (!emails || emails.length === 0) {
+                document.getElementById('browse-content').innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #9ca3af; padding: 2rem;">No emails found</div>';
+                return;
+            }
+
+            const folderColor = {
+                'Inbox': '#d1fae5',
+                'Promotions': '#fef3c7',
+                'Social': '#e0e7ff',
+                'Updates': '#bfdbfe',
+                'Spam': '#fee2e2',
+                'Trash': '#f3f4f6'
+            };
+            const badgeColor = {
+                'Inbox': '#10b981',
+                'Promotions': '#f59e0b',
+                'Social': '#6366f1',
+                'Updates': '#3b82f6',
+                'Spam': '#ef4444',
+                'Trash': '#6b7280'
+            };
+
+            let html = emails.map(email => {
+                const fromEmail = email.from.replace(/.*<(.+?)>/, '$1') || email.from;
+                const fromName = email.from.replace(/<.+>/, '').trim() || fromEmail;
+
+                return `
+                    <div data-from="${email.from.toLowerCase()}" data-subject="${email.subject.toLowerCase()}" data-folder="${email.folder.toLowerCase()}"
+                         style="background: ${folderColor[email.folder] || '#f9fafb'};
+                                 border-radius: 0.5rem;
+                                 padding: 1.5rem;
+                                 min-height: 200px;
+                                 display: flex;
+                                 flex-direction: column;
+                                 justify-content: space-between;
+                                 border: 1px solid rgba(0,0,0,0.1);">
+
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0; color: #1f2937; font-size: 0.95rem; font-weight: 600; word-break: break-word;">
+                                        ${email.subject || '(No subject)'}
+                                    </h4>
+                                    <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.85rem;">
+                                        ${fromName}
+                                    </p>
+                                    <p style="margin: 0.25rem 0 0 0; color: #9ca3af; font-size: 0.75rem;">
+                                        ${fromEmail}
+                                    </p>
+                                </div>
+                                <span style="background: ${badgeColor[email.folder] || '#9ca3af'};
+                                            color: white;
+                                            padding: 0.35rem 0.75rem;
+                                            border-radius: 9999px;
+                                            font-size: 0.8rem;
+                                            font-weight: 600;
+                                            white-space: nowrap;
+                                            margin-top: 0.25rem;">
+                                    ${email.folder}
+                                </span>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.05);
+                                        padding: 0.75rem;
+                                        border-radius: 0.375rem;
+                                        margin-top: 0.75rem;
+                                        font-size: 0.8rem;
+                                        color: #4b5563;
+                                        max-height: 70px;
+                                        overflow: hidden;
+                                        line-height: 1.4;">
+                                ${email.snippet || 'No preview available'}
+                            </div>
+                        </div>
+
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.75rem;">
+                            ${email.date ? new Date(email.date).toLocaleString() : 'Unknown date'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('browse-content').innerHTML = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">${html}</div>`;
+        }
+
+        function filterByFolder(folder) {
+            const cards = document.querySelectorAll('[data-folder]');
+            cards.forEach(card => {
+                if (folder === 'all' || card.getAttribute('data-folder') === folder.toLowerCase()) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function filterEmails() {
+            const searchTerm = document.getElementById('search-emails').value.toLowerCase();
+            const cards = document.querySelectorAll('[data-from]');
+
+            cards.forEach(card => {
+                const from = card.getAttribute('data-from').toLowerCase();
+                const subject = card.getAttribute('data-subject').toLowerCase();
+
+                if (from.includes(searchTerm) || subject.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Load dashboard on start
+        loadDashboard();
+    </script>
+</body>
+</html>

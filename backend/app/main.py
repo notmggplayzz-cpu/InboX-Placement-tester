@@ -1,9 +1,11 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
 from app.database import init_db
@@ -48,15 +50,9 @@ app.add_middleware(
 app.include_router(accounts.router, prefix="/api/accounts", tags=["accounts"])
 app.include_router(tests.router, prefix="/api/tests", tags=["tests"])
 
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Email Inbox Placement Tester API",
-        "version": "1.0.0",
-        "docs": "/docs",
-    }
-
+static_dir = Path(__file__).parent.parent / "static"
+if static_dir.exists():
+    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
 @app.get("/health")
 async def health_check():
