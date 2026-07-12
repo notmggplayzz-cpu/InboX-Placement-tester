@@ -36,7 +36,7 @@ setup_logging()
 
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.seoleads.me"],
+    allowed_hosts=["localhost", "127.0.0.1", "*.seoleads.me", "*.replit.dev"],
 )
 
 app.add_middleware(
