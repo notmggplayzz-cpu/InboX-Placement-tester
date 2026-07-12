@@ -26,11 +26,14 @@ SCOPES = [
 ]
 
 
-def get_google_oauth_url(state: str) -> str:
+def get_google_oauth_url(state: str, redirect_uri: str = None) -> str:
     """Generate Google OAuth authorization URL."""
+    if not redirect_uri:
+        redirect_uri = settings.google_redirect_uri
+
     params = {
         "client_id": settings.google_client_id,
-        "redirect_uri": settings.google_redirect_uri,
+        "redirect_uri": redirect_uri,
         "response_type": "code",
         "scope": " ".join(SCOPES),
         "access_type": "offline",
@@ -40,10 +43,13 @@ def get_google_oauth_url(state: str) -> str:
     return f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
 
 
-async def exchange_code_for_token(code: str) -> dict:
+async def exchange_code_for_token(code: str, redirect_uri: str = None) -> dict:
     """Exchange authorization code for access token."""
+    if not redirect_uri:
+        redirect_uri = settings.google_redirect_uri
+
     loop = asyncio.get_event_loop()
-    token_data = await loop.run_in_executor(None, _exchange_code_for_token_sync, code)
+    token_data = await loop.run_in_executor(None, _exchange_code_for_token_sync, code, redirect_uri)
 
     # Get email from token if not included
     if not token_data.get("email"):
@@ -53,9 +59,12 @@ async def exchange_code_for_token(code: str) -> dict:
     return token_data
 
 
-def _exchange_code_for_token_sync(code: str) -> dict:
+def _exchange_code_for_token_sync(code: str, redirect_uri: str = None) -> dict:
     """Synchronous code exchange."""
     import requests
+
+    if not redirect_uri:
+        redirect_uri = settings.google_redirect_uri
 
     token_url = "https://oauth2.googleapis.com/token"
     payload = {
@@ -63,7 +72,7 @@ def _exchange_code_for_token_sync(code: str) -> dict:
         "client_secret": settings.google_client_secret,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": settings.google_redirect_uri,
+        "redirect_uri": redirect_uri,
     }
 
     try:

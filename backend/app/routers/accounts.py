@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db, GmailAccount
@@ -16,10 +16,11 @@ router = APIRouter()
 
 
 @router.get("/oauth-url")
-async def get_oauth_url(state: str = Query(...)):
+async def get_oauth_url(request: Request, state: str = Query(...)):
     """Get Google OAuth authorization URL."""
     try:
-        url = get_google_oauth_url(state)
+        redirect_uri = f"{request.url.scheme}://{request.headers.get('host')}/api/accounts/callback"
+        url = get_google_oauth_url(state, redirect_uri)
         return {"url": url}
     except Exception as e:
         logger.error(f"Failed to generate OAuth URL: {e}")
@@ -28,13 +29,15 @@ async def get_oauth_url(state: str = Query(...)):
 
 @router.get("/callback", include_in_schema=False)
 async def oauth_callback_get(
+    request: Request,
     code: str = Query(...),
     state: str = Query(...),
     db: Session = Depends(get_db),
 ):
     """Handle OAuth callback from Google (GET)."""
     try:
-        token_response = await exchange_code_for_token(code)
+        redirect_uri = f"{request.url.scheme}://{request.headers.get('host')}/api/accounts/callback"
+        token_response = await exchange_code_for_token(code, redirect_uri)
         user_id = state
 
         # Get email from token
