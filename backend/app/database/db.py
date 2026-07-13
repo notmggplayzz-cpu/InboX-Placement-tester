@@ -43,7 +43,22 @@ def get_db() -> Session:
 
 def init_db():
     from app.database.models import Base
-    Base.metadata.create_all(bind=engine)
+    from app.utils.logging import get_logger
+    logger = get_logger(__name__)
+
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        logger.warning(f"Database schema creation failed (likely corrupted): {e}")
+        logger.info("Dropping all tables and recreating...")
+        try:
+            Base.metadata.drop_all(bind=engine)
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database reset successfully")
+        except Exception as drop_error:
+            logger.error(f"Failed to reset database: {drop_error}")
+            raise
+
     seed_demo_accounts()
 
 
