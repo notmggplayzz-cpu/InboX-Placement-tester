@@ -49,14 +49,10 @@ def init_db():
     try:
         Base.metadata.create_all(bind=engine)
     except Exception as e:
-        logger.warning(f"Database schema creation failed (likely corrupted): {e}")
-        logger.info("Dropping all tables and recreating...")
-        try:
-            Base.metadata.drop_all(bind=engine)
-            Base.metadata.create_all(bind=engine)
-            logger.info("Database reset successfully")
-        except Exception as drop_error:
-            logger.error(f"Failed to reset database: {drop_error}")
+        if "already exists" in str(e):
+            logger.info("Database schema already exists, skipping creation")
+        else:
+            logger.error(f"Database initialization error: {e}")
             raise
 
 
