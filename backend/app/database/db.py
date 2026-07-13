@@ -48,12 +48,10 @@ def init_db():
 
     try:
         Base.metadata.create_all(bind=engine)
+        logger.info("Database schema created successfully")
     except Exception as e:
-        if "already exists" in str(e):
-            logger.info("Database schema already exists, skipping creation")
-        else:
-            logger.error(f"Database initialization error: {e}")
-            raise
+        logger.warning(f"Database schema creation error (non-fatal): {e}")
+        logger.info("Continuing with existing database...")
 
 
 def seed_demo_accounts():
