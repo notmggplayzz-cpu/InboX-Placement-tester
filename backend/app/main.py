@@ -4,7 +4,6 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
@@ -33,11 +32,6 @@ app = FastAPI(
 )
 
 setup_logging()
-
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["localhost", "127.0.0.1", "*.seoleads.me", "*.replit.dev", "*.railway.app"],
-)
 
 app.add_middleware(
     CORSMiddleware,
