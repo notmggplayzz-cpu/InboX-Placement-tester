@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ../.env .env
 COPY . .
 
 EXPOSE 8000
