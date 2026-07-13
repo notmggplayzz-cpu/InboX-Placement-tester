@@ -44,3 +44,56 @@ def get_db() -> Session:
 def init_db():
     from app.database.models import Base
     Base.metadata.create_all(bind=engine)
+    seed_demo_accounts()
+
+
+def seed_demo_accounts():
+    from app.database.models import GmailAccount
+    from app.utils.encryption import cipher_suite
+    from datetime import datetime, timedelta
+
+    demo_emails = [
+        "these-kaifmerchant81@gmail.com",
+        "notmggplayzz@gmail.com",
+        "chrismareno67@gmail.com",
+        "trendyworldnewss@gmail.com",
+        "chatgod48@gmail.com",
+    ]
+
+    db = SessionLocal()
+    try:
+        for email in demo_emails:
+            existing = db.query(GmailAccount).filter(
+                GmailAccount.email == email
+            ).first()
+
+            if not existing:
+                dummy_token = {
+                    "access_token": "pending",
+                    "refresh_token": "pending",
+                    "expires_in": 3600,
+                }
+
+                account = GmailAccount(
+                    email=email,
+                    user_id="demo",
+                    nickname=email.split("@")[0],
+                    access_token_encrypted=cipher_suite.encrypt(
+                        "pending".encode()
+                    ),
+                    refresh_token_encrypted=cipher_suite.encrypt(
+                        "pending".encode()
+                    ),
+                    token_expiry=datetime.utcnow() + timedelta(hours=1),
+                    is_active=True,
+                )
+                db.add(account)
+
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        from app.utils.logging import get_logger
+        logger = get_logger(__name__)
+        logger.error(f"Error seeding demo accounts: {e}")
+    finally:
+        db.close()
