@@ -64,7 +64,7 @@ def init_db():
 
 def seed_demo_accounts():
     from app.database.models import GmailAccount
-    from app.utils.encryption import cipher_suite
+    from app.utils.encryption import encrypt_token
     from datetime import datetime, timedelta
 
     demo_emails = [
@@ -83,22 +83,12 @@ def seed_demo_accounts():
             ).first()
 
             if not existing:
-                dummy_token = {
-                    "access_token": "pending",
-                    "refresh_token": "pending",
-                    "expires_in": 3600,
-                }
-
                 account = GmailAccount(
                     email=email,
                     user_id="demo",
                     nickname=email.split("@")[0],
-                    access_token_encrypted=cipher_suite.encrypt(
-                        "pending".encode()
-                    ),
-                    refresh_token_encrypted=cipher_suite.encrypt(
-                        "pending".encode()
-                    ),
+                    access_token_encrypted=encrypt_token("pending"),
+                    refresh_token_encrypted=encrypt_token("pending"),
                     token_expiry=datetime.utcnow() + timedelta(hours=1),
                     is_active=True,
                 )
