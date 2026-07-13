@@ -87,3 +87,4 @@ if __name__ == "__main__":
         port=settings.api_port,
         workers=settings.api_workers,
     )
+# Force redeploy
