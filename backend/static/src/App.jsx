@@ -24,8 +24,12 @@ export default function App() {
         accountsAPI.listAccounts(),
         testsAPI.listTests({ limit: 10 }),
       ])
-      setAccounts(accountsRes.data || [])
-      setTests(testsRes.data || [])
+      const accountsData = Array.isArray(accountsRes.data) ? accountsRes.data : accountsRes.data?.data || []
+      const testsData = Array.isArray(testsRes.data) ? testsRes.data : testsRes.data?.data || []
+      console.log('Loaded accounts:', accountsData)
+      console.log('Loaded tests:', testsData)
+      setAccounts(accountsData)
+      setTests(testsData)
     } catch (error) {
       console.error('Failed to load data:', error)
     } finally {
