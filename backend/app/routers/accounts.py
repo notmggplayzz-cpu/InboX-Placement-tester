@@ -196,7 +196,7 @@ async def seed_demo_accounts(db: Session = Depends(get_db)):
     from datetime import datetime, timedelta
 
     demo_emails = [
-        "these-kaifmerchant81@gmail.com",
+        "kaifmerchant81@gmail.com",
         "notmggplayzz@gmail.com",
         "chrismareno67@gmail.com",
         "trendyworldnewss@gmail.com",
