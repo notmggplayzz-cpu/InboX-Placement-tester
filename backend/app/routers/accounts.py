@@ -187,3 +187,46 @@ async def delete_account(account_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Failed to delete account: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/seed/demo", include_in_schema=False)
+async def seed_demo_accounts(db: Session = Depends(get_db)):
+    """Seed demo accounts (admin endpoint)."""
+    from app.utils.encryption import encrypt_token
+    from datetime import datetime, timedelta
+
+    demo_emails = [
+        "these-kaifmerchant81@gmail.com",
+        "notmggplayzz@gmail.com",
+        "chrismareno67@gmail.com",
+        "trendyworldnewss@gmail.com",
+        "chatgod48@gmail.com",
+    ]
+
+    try:
+        created_count = 0
+        for email in demo_emails:
+            existing = db.query(GmailAccount).filter(
+                GmailAccount.email == email
+            ).first()
+
+            if not existing:
+                account = GmailAccount(
+                    email=email,
+                    user_id="demo",
+                    nickname=email.split("@")[0],
+                    access_token_encrypted=encrypt_token("pending"),
+                    refresh_token_encrypted=encrypt_token("pending"),
+                    token_expiry=datetime.utcnow() + timedelta(hours=1),
+                    is_active=True,
+                )
+                db.add(account)
+                created_count += 1
+
+        db.commit()
+        return {"message": f"Seeded {created_count} demo accounts"}
+
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to seed demo accounts: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -59,8 +59,6 @@ def init_db():
             logger.error(f"Failed to reset database: {drop_error}")
             raise
 
-    seed_demo_accounts()
-
 
 def seed_demo_accounts():
     from app.database.models import GmailAccount
