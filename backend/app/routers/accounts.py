@@ -215,8 +215,8 @@ async def seed_demo_accounts(db: Session = Depends(get_db)):
                     email=email,
                     user_id="demo",
                     nickname=email.split("@")[0],
-                    access_token_encrypted=encrypt_token("pending"),
-                    refresh_token_encrypted=encrypt_token("pending"),
+                    access_token=encrypt_token("pending"),
+                    refresh_token=encrypt_token("pending"),
                     token_expiry=datetime.utcnow() + timedelta(hours=1),
                     is_active=True,
                 )
