@@ -20,18 +20,27 @@ export default function App() {
     setLoading(true)
     try {
       const { accountsAPI, testsAPI } = await import('./services/api')
-      const [accountsRes, testsRes] = await Promise.all([
-        accountsAPI.listAccounts(),
-        testsAPI.listTests({ limit: 10 }),
-      ])
-      const accountsData = Array.isArray(accountsRes.data) ? accountsRes.data : accountsRes.data?.data || []
-      const testsData = Array.isArray(testsRes.data) ? testsRes.data : testsRes.data?.data || []
-      console.log('Loaded accounts:', accountsData)
-      console.log('Loaded tests:', testsData)
+
+      // Load accounts
+      const accountsRes = await accountsAPI.listAccounts()
+      const accountsData = Array.isArray(accountsRes) ? accountsRes :
+                          Array.isArray(accountsRes.data) ? accountsRes.data : []
+      console.log('Loaded accounts:', accountsData, 'Count:', accountsData.length)
       setAccounts(accountsData)
-      setTests(testsData)
+
+      // Load tests
+      try {
+        const testsRes = await testsAPI.listTests({ limit: 10 })
+        const testsData = Array.isArray(testsRes) ? testsRes :
+                         Array.isArray(testsRes.data) ? testsRes.data : []
+        console.log('Loaded tests:', testsData)
+        setTests(testsData)
+      } catch (testError) {
+        console.warn('Failed to load tests (non-fatal):', testError)
+      }
     } catch (error) {
-      console.error('Failed to load data:', error)
+      console.error('Failed to load accounts:', error)
+      setAccounts([])
     } finally {
       setLoading(false)
     }
